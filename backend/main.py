@@ -10,6 +10,7 @@ from app.diagnostics import (
     get_top_slow_queries,
     get_query_plan,
 )
+from app.investigator import investigate_incident
 
 
 app = FastAPI(
@@ -50,3 +51,10 @@ def query_plan(
     db: Annotated[Session, Depends(get_db)],
 ) -> list[str]:
     return get_query_plan(db)
+
+
+@app.get("/api/investigate")
+def investigate(
+    db: Annotated[Session, Depends(get_db)],
+) -> dict:
+    return investigate_incident(db)
