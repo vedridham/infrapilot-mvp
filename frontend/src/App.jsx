@@ -14,8 +14,14 @@ function App() {
   const [investigation, setInvestigation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
   const [approved, setApproved] = useState(false);
+  const [rejected, setRejected] = useState(false);
+
+  const [reviewOpen, setReviewOpen] = useState(false);
   const [auditLogs, setAuditLogs] = useState([]);
+
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const handleApproval = async () => {
     try {
@@ -31,6 +37,38 @@ function App() {
       }
 
       setApproved(true);
+      setReviewOpen(false);
+      loadAuditLogs();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleReject = async () => {
+    if (!rejectionReason.trim()) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+  "http://127.0.0.1:8000/api/incidents/1/reject",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      reason: rejectionReason.trim(),
+    }),
+  }
+);
+
+      if (!response.ok) {
+        throw new Error("Rejection failed");
+      }
+
+      setRejected(true);
+      setReviewOpen(false);
       loadAuditLogs();
     } catch (error) {
       console.error(error);
@@ -245,9 +283,45 @@ function App() {
 
             <p>{diagnosis?.rollback_plan}</p>
 
+            {reviewOpen && (
+              <div className="review-panel">
+                <h3>Review Recommendation</h3>
+
+                <p>
+                  Please review the recommended action before approving it.
+                </p>
+
+                <textarea
+                  className="rejection-reason"
+                  placeholder="If rejecting, briefly explain why..."
+                  value={rejectionReason}
+                  onChange={(e) => setRejectionReason(e.target.value)}
+                  maxLength={500}
+                />
+
+                <div className="review-actions">
+                  <button
+                    className="approval-button"
+                    onClick={handleApproval}
+                    disabled={approved}
+                  >
+                    {approved ? "Approved ✓" : "Approve"}
+                  </button>
+
+                  <button
+                    className="reject-button"
+                    onClick={handleReject}
+                    disabled={false}
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            )}
+
             <button
               className="approval-button"
-              onClick={handleApproval}
+              onClick={() => setReviewOpen(true)}
               disabled={approved}
             >
               {approved ? "Approved ✓" : "Review & Approve"}
@@ -272,9 +346,20 @@ function App() {
                   <strong>{log.actor}</strong>
 
                   <p>
-                    Approval recorded at{" "}
-                    {new Date(log.created_at).toLocaleString()}
-                  </p>
+  {log.action === "REJECTED"
+    ? `Rejection recorded at ${new Date(log.created_at).toLocaleString()}`
+    : `Approval recorded at ${new Date(log.created_at).toLocaleString()}`}
+</p>
+
+{log.action === "REJECTED" && log.details && (
+  <p>
+    <strong>Reason:</strong>{" "}
+    {typeof log.details === "string"
+      ? JSON.parse(log.details).reason
+      : log.details.reason}
+  </p>
+)}
+
                 </div>
               </div>
             ))}

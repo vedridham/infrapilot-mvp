@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, Path
+from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import text
@@ -19,11 +20,17 @@ app = FastAPI(
     title="InfraPilot API",
     version="0.1.0",
 )
+
+
+class RejectRequest(BaseModel):
+    reason: str = Field(..., min_length=1, max_length=500)
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
     allow_credentials=True,
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST"],
     allow_headers=["*"],
 )
 
@@ -68,8 +75,12 @@ def investigate(
 ) -> dict:
     return investigate_incident(db)
 
+
 @app.post("/api/incidents/{incident_id}/approve")
-def approve_incident(incident_id: int, db: Session = Depends(get_db)):
+def approve_incident(
+    incident_id: int,
+    db: Session = Depends(get_db),
+):
     result = db.execute(
         text(
             """
@@ -93,8 +104,42 @@ def approve_incident(incident_id: int, db: Session = Depends(get_db)):
 
     return dict(result.fetchone()._mapping)
 
+
+@app.post("/api/incidents/{incident_id}/reject")
+def reject_incident(
+    incident_id: int,
+    request: RejectRequest,
+    db: Session = Depends(get_db),
+):
+    result = db.execute(
+        text(
+            """
+            INSERT INTO audit_logs (incident_id, action, actor, details)
+            VALUES (
+                :incident_id,
+                'REJECTED',
+                'developer',
+                :details
+            )
+            RETURNING id, incident_id, action, actor, details, created_at
+            """
+        ),
+        {
+            "incident_id": incident_id,
+            "details": f'{{"reason": "{request.reason}"}}',
+        },
+    )
+
+    db.commit()
+
+    return dict(result.fetchone()._mapping)
+
+
 @app.get("/api/incidents/{incident_id}/audit-logs")
-def get_incident_audit_logs(incident_id: int, db: Session = Depends(get_db)):
+def get_incident_audit_logs(
+    incident_id: int,
+    db: Session = Depends(get_db),
+):
     result = db.execute(
         text(
             """

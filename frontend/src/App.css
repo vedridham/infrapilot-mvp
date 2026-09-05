@@ -17,6 +17,10 @@ button {
   min-height: 100vh;
 }
 
+/* =========================
+   TOP BAR
+========================= */
+
 .topbar {
   background: #ffffff;
   border-bottom: 1px solid #e5eaf1;
@@ -54,11 +58,19 @@ button {
   border-radius: 50%;
 }
 
+/* =========================
+   MAIN DASHBOARD
+========================= */
+
 .dashboard {
   max-width: 1250px;
   margin: 0 auto;
   padding: 42px 24px 60px;
 }
+
+/* =========================
+   HERO
+========================= */
 
 .hero {
   background: #173b70;
@@ -96,6 +108,10 @@ button {
   color: #6d7f98;
 }
 
+/* =========================
+   CONFIDENCE
+========================= */
+
 .confidence-card {
   min-width: 150px;
   background: #ffffff;
@@ -117,6 +133,10 @@ button {
   text-transform: uppercase;
   color: #287a50;
 }
+
+/* =========================
+   SUMMARY
+========================= */
 
 .summary-grid {
   display: grid;
@@ -152,11 +172,16 @@ button {
   margin: 0;
   font-size: 18px;
   line-height: 1.5;
+  color: #172033;
 }
 
 .summary-card.danger {
   border-left: 5px solid #d85b5b;
 }
+
+/* =========================
+   SECTIONS
+========================= */
 
 .section {
   margin-top: 34px;
@@ -173,9 +198,9 @@ button {
   color: #172033;
 }
 
-.summary-card h3 {
-  color: #172033;
-}
+/* =========================
+   EVIDENCE
+========================= */
 
 .evidence-list {
   display: grid;
@@ -213,6 +238,10 @@ button {
   font-size: 14px;
 }
 
+/* =========================
+   TWO COLUMN
+========================= */
+
 .two-column {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -232,6 +261,10 @@ button {
   margin-bottom: 12px;
 }
 
+/* =========================
+   APPROVAL BUTTON
+========================= */
+
 .approval-button {
   margin-top: 20px;
   border: none;
@@ -241,11 +274,118 @@ button {
   padding: 11px 18px;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
 }
 
 .approval-button:hover {
   background: #24528f;
 }
+
+.approval-button:active {
+  transform: translateY(1px);
+}
+
+.approval-button:disabled {
+  background: #9aa7b8;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================
+   REVIEW PANEL
+========================= */
+
+.review-panel {
+  margin-top: 20px;
+  padding: 22px;
+  background: #f8fafc;
+  border: 1px solid #dce4ef;
+  border-radius: 12px;
+}
+
+.review-panel h3 {
+  margin: 0 0 8px;
+  color: #173b70;
+  font-size: 18px;
+}
+
+.review-panel p {
+  margin-bottom: 14px;
+}
+
+/* =========================
+   REJECTION TEXTAREA
+========================= */
+
+.rejection-reason {
+  width: 100%;
+  min-height: 100px;
+  margin-top: 8px;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #172033;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.rejection-reason::placeholder {
+  color: #94a3b8;
+}
+
+.rejection-reason:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* =========================
+   REVIEW ACTIONS
+========================= */
+
+.review-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+/* =========================
+   REJECT BUTTON
+========================= */
+
+.reject-button {
+  margin-top: 20px;
+  border: none;
+  border-radius: 8px;
+  background: #c94b4b;
+  color: white;
+  padding: 11px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.reject-button:hover {
+  background: #ad3f3f;
+}
+
+.reject-button:active {
+  transform: translateY(1px);
+}
+
+.reject-button:disabled {
+  background: #b9c0ca;
+  color: #ffffff;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================
+   METRICS
+========================= */
 
 .metrics-grid {
   display: grid;
@@ -262,6 +402,36 @@ button {
   color: #173b70;
 }
 
+/* =========================
+   AUDIT LOG
+========================= */
+
+.audit-log {
+  margin-top: 16px;
+}
+
+.audit-entry {
+  padding: 16px;
+  margin-bottom: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.audit-entry strong {
+  color: #173b70;
+}
+
+.audit-entry p {
+  margin: 5px 0 0;
+  color: #59687d;
+  font-size: 13px;
+}
+
+/* =========================
+   ERROR
+========================= */
+
 .error-box {
   max-width: 600px;
   margin: 100px auto;
@@ -275,6 +445,14 @@ button {
 .error-box h2 {
   color: #b54747;
 }
+
+.error-box p {
+  color: #59687d;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media (max-width: 800px) {
   .topbar {
@@ -298,5 +476,13 @@ button {
 
   .dashboard {
     padding: 28px 16px 40px;
+  }
+
+  .review-actions {
+    flex-direction: column;
+  }
+
+  .review-actions button {
+    width: 100%;
   }
 }
