@@ -1,6 +1,7 @@
+import json
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, Path
+from fastapi import Depends, FastAPI, Path, HTTPException
 from pydantic import BaseModel, Field
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -81,6 +82,17 @@ def approve_incident(
     incident_id: int,
     db: Session = Depends(get_db),
 ):
+    incident = db.execute(
+        text("SELECT id FROM incidents WHERE id = :incident_id"),
+        {"incident_id": incident_id},
+    ).fetchone()
+
+    if incident is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Incident not found",
+        )
+
     result = db.execute(
         text(
             """
@@ -96,7 +108,7 @@ def approve_incident(
         ),
         {
             "incident_id": incident_id,
-            "details": '{"source": "infrapilot-ui"}',
+            "details": json.dumps({"source": "infrapilot-ui"}),
         },
     )
 
@@ -111,6 +123,17 @@ def reject_incident(
     request: RejectRequest,
     db: Session = Depends(get_db),
 ):
+    incident = db.execute(
+        text("SELECT id FROM incidents WHERE id = :incident_id"),
+        {"incident_id": incident_id},
+    ).fetchone()
+
+    if incident is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Incident not found",
+        )
+
     result = db.execute(
         text(
             """
@@ -126,7 +149,7 @@ def reject_incident(
         ),
         {
             "incident_id": incident_id,
-            "details": f'{{"reason": "{request.reason}"}}',
+            "details": json.dumps({"reason": request.reason}),
         },
     )
 
